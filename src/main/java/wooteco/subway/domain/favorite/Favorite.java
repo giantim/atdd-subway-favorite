@@ -2,7 +2,6 @@ package wooteco.subway.domain.favorite;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceConstructor;
-
 import wooteco.subway.service.favorite.dto.FavoriteRequest;
 
 public class Favorite {
@@ -29,7 +28,9 @@ public class Favorite {
     }
 
     public boolean isDuplicate(Favorite favorite) {
-        return this.memberId.equals(favorite.memberId) && this.departure.equals(favorite.departure) && this.arrival.equals(favorite.arrival);
+        return this.memberId.equals(favorite.memberId)
+                && this.departure.equals(favorite.departure)
+                && this.arrival.equals(favorite.arrival);
     }
 
     public Long getId() {
