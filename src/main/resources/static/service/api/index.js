@@ -60,6 +60,7 @@ const api = (() => {
       response.json().then(response => alert(response.errorMessage))
       return;
     }
+    return response;
   });
 
   const requestWithJsonData = (uri, config) =>

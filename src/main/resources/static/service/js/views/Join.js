@@ -1,4 +1,4 @@
-import { EVENT_TYPE, ERROR_MESSAGE } from "../../utils/constants.js";
+import {ERROR_MESSAGE, EVENT_TYPE} from "../../utils/constants.js";
 import showSnackbar from "../../lib/snackbar/index.js";
 import api from "../../api/index.js";
 
@@ -21,7 +21,8 @@ function Join() {
         .create(newMember)
         .then((response) => {
           if (response.ok) {
-            location.href = "/";
+            alert("회원가입이 완료되었습니다.");
+            return location.href = "/";
           } else {
             response.json().then(response => {
               alert(response.errorMessage);
