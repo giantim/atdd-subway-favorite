@@ -1,5 +1,6 @@
 package wooteco.subway.domain.favorite;
 
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -16,4 +17,8 @@ public interface FavoriteRepository extends CrudRepository<Favorite, Long> {
     Optional<Favorite> findByMemberIdAndDepartureIdAndArrivalId(@Param("memberId") Long memberId,
                                                             @Param("departureId") Long departureId,
                                                             @Param("arrivalId") Long arrivalId);
+
+    @Modifying
+    @Query("DELETE FROM favorite WHERE member_id = :memberId")
+    void deleteByMemberId(@Param("memberId") Long memberId);
 }

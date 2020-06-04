@@ -1,5 +1,6 @@
 package wooteco.subway.acceptance.favorite;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class FavoriteAcceptanceTest extends AcceptanceTest {
+    @DisplayName("즐겨찾기 관련 기능")
     @TestFactory
     public Stream<DynamicTest> manageFavorite() {
         // given 노선과 역, 구간이 주어진다

@@ -12,11 +12,14 @@ function Search() {
   const $shortestDistanceTab = document.querySelector('#shortest-distance-tab')
   const $minimumTimeTab = document.querySelector('#minimum-time-tab')
 
+  let stations = [];
+
   const showSearchResult = data => {
     const isHidden = $searchResultContainer.classList.contains('hidden')
     if (isHidden) {
       $searchResultContainer.classList.remove('hidden')
     }
+    stations = data.stations;
     $searchResult.innerHTML = searchResultTemplate(data)
   }
 
@@ -51,7 +54,17 @@ function Search() {
     const isFavorite = $favoriteButton.classList.contains('mdi-star')
     const classList = $favoriteButton.classList
 
-    await api.favorite.create({"departure":$departureStationName.value , "arrival":$arrivalStationName.value});
+    const departureId = stations[0].id;
+    const arrivalId = stations[stations.length - 1].id;
+
+    await api.favorite.create({
+      departureId,
+      arrivalId
+    }).then(response => {
+      if (response.ok) {
+        alert("즐겨찾기에 저장되었습니다.");
+      }
+    });
 
     if (isFavorite) {
       classList.add('mdi-star-outline')
