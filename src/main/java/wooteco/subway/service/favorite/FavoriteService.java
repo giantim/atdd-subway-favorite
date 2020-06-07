@@ -31,8 +31,10 @@ public class FavoriteService {
     @Transactional
     public Long create(Long memberId, FavoriteRequest favoriteRequest) {
         memberRepository.findById(memberId).orElseThrow(InvalidMemberIdException::new);
-        stationRepository.findById(favoriteRequest.getDepartureId()).orElseThrow(InvalidStationNameException::new);
-        stationRepository.findById(favoriteRequest.getArrivalId()).orElseThrow(InvalidStationNameException::new);
+        List<Long> stationIds = favoriteRequest.stationsIds();
+        if (stationRepository.findAllById(stationIds).size() != 2) {
+            throw new InvalidStationNameException();
+        }
 
         Favorite favorite = Favorite.of(memberId, favoriteRequest);
 

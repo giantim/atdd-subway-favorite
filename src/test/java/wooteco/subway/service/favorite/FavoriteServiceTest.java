@@ -14,6 +14,7 @@ import wooteco.subway.domain.station.StationRepository;
 import wooteco.subway.service.favorite.dto.FavoriteRequest;
 import wooteco.subway.service.favorite.exception.DuplicateFavoriteException;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -51,10 +52,7 @@ class FavoriteServiceTest {
         Favorite favorite = new Favorite(1L, 1L, favoriteRequest.getDepartureId(),
                 favoriteRequest.getArrivalId());
 
-        when(stationRepository.findById(favoriteRequest.getDepartureId()))
-                .thenReturn(Optional.of(new Station("잠실")));
-        when(stationRepository.findById(favoriteRequest.getArrivalId()))
-                .thenReturn(Optional.of(new Station("강남")));
+        when(stationRepository.findAllById(any())).thenReturn(Arrays.asList(new Station(), new Station()));
         when(memberRepository.findById(1L)).thenReturn(Optional.of(new Member()));
         when(favoriteRepository.findAllByMemberId(1L))
                 .thenReturn(Collections.emptyList());
@@ -71,10 +69,7 @@ class FavoriteServiceTest {
         FavoriteRequest duplicatedFavoriteRequest = new FavoriteRequest(jamsil.getId(), gangnam.getId());
 
         when(memberRepository.findById(1L)).thenReturn(Optional.of(new Member("a@a", "a", "a")));
-        when(stationRepository.findById(duplicatedFavoriteRequest.getDepartureId()))
-                .thenReturn(Optional.of(new Station(1L, "잠실")));
-        when(stationRepository.findById(duplicatedFavoriteRequest.getArrivalId()))
-                .thenReturn(Optional.of(new Station(2L, "강남")));
+        when(stationRepository.findAllById(any())).thenReturn(Arrays.asList(new Station(), new Station()));
         when(favoriteRepository.findAllByMemberId(duplicatedMemberId))
                 .thenReturn(Collections.singletonList(new Favorite(duplicatedMemberId,
                         duplicatedFavoriteRequest.getDepartureId(), duplicatedFavoriteRequest.getArrivalId())));
