@@ -21,9 +21,11 @@ public class GraphService {
                 .forEach(it -> graph.addVertex(it));
 
         lines.stream()
-                .flatMap(it -> it.getStations().stream())
-                .filter(it -> Objects.nonNull(it.getPreStationId()))
-                .forEach(it -> graph.setEdgeWeight(graph.addEdge(it.getPreStationId(), it.getStationId()), type.findWeightOf(it)));
+                .flatMap(it -> it.getLineStations().getStations().stream())
+                .filter(it -> Objects.nonNull(it.getPreStation()))
+                .forEach(it ->
+                        graph.setEdgeWeight(graph.addEdge(it.getPreStation().getId(), it.getStation().getId()),
+                                type.findWeightOf(it)));
 
         DijkstraShortestPath dijkstraShortestPath = new DijkstraShortestPath(graph);
         return dijkstraShortestPath.getPath(source, target).getVertexList();

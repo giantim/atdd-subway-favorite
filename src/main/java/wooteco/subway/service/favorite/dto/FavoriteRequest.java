@@ -6,27 +6,27 @@ import java.util.List;
 
 public class FavoriteRequest {
     @NotNull
-    private Long departureId;
+    private String departureName;
     @NotNull
-    private Long arrivalId;
+    private String arrivalName;
 
     private FavoriteRequest() {
     }
 
-    public FavoriteRequest(Long departureId, Long arrivalId) {
-        this.departureId = departureId;
-        this.arrivalId = arrivalId;
+    public FavoriteRequest(String departureName, String arrivalName) {
+        this.departureName = departureName;
+        this.arrivalName = arrivalName;
     }
 
-    public List<Long> stationsIds() {
-        return Arrays.asList(departureId, arrivalId);
+    public List<String> stationNames() {
+        return Arrays.asList(departureName, arrivalName);
     }
 
-    public Long getDepartureId() {
-        return departureId;
+    public String getDepartureName() {
+        return departureName;
     }
 
-    public Long getArrivalId() {
-        return arrivalId;
+    public String getArrivalName() {
+        return arrivalName;
     }
 }

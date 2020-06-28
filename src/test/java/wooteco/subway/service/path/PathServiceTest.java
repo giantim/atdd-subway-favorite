@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import wooteco.subway.service.path.dto.PathResponse;
-import wooteco.subway.service.station.dto.StationResponse;
 import wooteco.subway.domain.line.Line;
 import wooteco.subway.domain.line.LineRepository;
 import wooteco.subway.domain.line.LineStation;
 import wooteco.subway.domain.path.PathType;
 import wooteco.subway.domain.station.Station;
 import wooteco.subway.domain.station.StationRepository;
+import wooteco.subway.service.path.dto.PathResponse;
+import wooteco.subway.service.station.dto.StationResponse;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -48,7 +48,6 @@ public class PathServiceTest {
     private Station station3;
     private Station station4;
     private Station station5;
-    private Station station6;
 
     private Line line1;
     private Line line2;
@@ -62,17 +61,16 @@ public class PathServiceTest {
         station3 = new Station(3L, STATION_NAME3);
         station4 = new Station(4L, STATION_NAME4);
         station5 = new Station(5L, STATION_NAME5);
-        station6 = new Station(6L, STATION_NAME6);
 
         line1 = new Line(1L, "2호선", LocalTime.of(05, 30), LocalTime.of(22, 30), 5);
-        line1.addLineStation(new LineStation(null, 1L, 10, 10));
-        line1.addLineStation(new LineStation(1L, 2L, 10, 10));
-        line1.addLineStation(new LineStation(2L, 3L, 10, 10));
+        line1.addLineStation(new LineStation(null, station1, 10, 10));
+        line1.addLineStation(new LineStation(station1, station2, 10, 10));
+        line1.addLineStation(new LineStation(station2, station3, 10, 10));
 
         line2 = new Line(2L, "신분당선", LocalTime.of(05, 30), LocalTime.of(22, 30), 5);
-        line2.addLineStation(new LineStation(null, 1L, 10, 10));
-        line2.addLineStation(new LineStation(1L, 4L, 10, 10));
-        line2.addLineStation(new LineStation(4L, 5L, 10, 10));
+        line2.addLineStation(new LineStation(null, station1, 10, 10));
+        line2.addLineStation(new LineStation(station1, station4, 10, 10));
+        line2.addLineStation(new LineStation(station4, station5, 10, 10));
     }
 
     @DisplayName("일반적인 상황의 경로 찾기")

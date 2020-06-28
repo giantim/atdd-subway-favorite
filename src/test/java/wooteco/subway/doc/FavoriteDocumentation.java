@@ -14,8 +14,8 @@ public class FavoriteDocumentation {
                 headerWithName("Authorization").description("The token for create favorite which is Bearer Type")
             ),
             requestFields(
-                fieldWithPath("departureId").type(JsonFieldType.STRING).description("The departure station id"),
-                fieldWithPath("arrivalId").type(JsonFieldType.STRING).description("The arrival station id")
+                fieldWithPath("departureName").type(JsonFieldType.STRING).description("The departure station id"),
+                fieldWithPath("arrivalName").type(JsonFieldType.STRING).description("The arrival station id")
             ),
             responseHeaders(
                 headerWithName("Location").description("The favorite's location which just created")
@@ -43,8 +43,8 @@ public class FavoriteDocumentation {
             ),
             responseFields(
                 fieldWithPath("[]").type(JsonFieldType.ARRAY).description("All Favorites"),
-                fieldWithPath("[].departureId").type(JsonFieldType.NUMBER).description("The departure station id"),
-                fieldWithPath("[].arrivalId").type(JsonFieldType.NUMBER).description("The arrival station id")
+                fieldWithPath("[].departureName").type(JsonFieldType.STRING).description("The departure station id"),
+                fieldWithPath("[].arrivalName").type(JsonFieldType.STRING).description("The arrival station id")
             )
         );
     }

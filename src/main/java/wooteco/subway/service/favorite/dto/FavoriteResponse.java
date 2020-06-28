@@ -7,19 +7,19 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 public class FavoriteResponse {
-    private Long departureId;
-    private Long arrivalId;
+    private String departureName;
+    private String arrivalName;
 
     private FavoriteResponse() {
     }
 
-    public FavoriteResponse(Long departureId, Long arrivalId) {
-        this.departureId = departureId;
-        this.arrivalId = arrivalId;
+    public FavoriteResponse(String departureName, String arrivalName) {
+        this.departureName = departureName;
+        this.arrivalName = arrivalName;
     }
 
     public static FavoriteResponse of(Favorite favorite) {
-        return new FavoriteResponse(favorite.getDepartureId(), favorite.getArrivalId());
+        return new FavoriteResponse(favorite.getDeparture().getName(), favorite.getArrival().getName());
     }
 
     public static List<FavoriteResponse> listOf(List<Favorite> favorites) {
@@ -28,11 +28,11 @@ public class FavoriteResponse {
             .collect(toList());
     }
 
-    public Long getDepartureId() {
-        return departureId;
+    public String getDepartureName() {
+        return departureName;
     }
 
-    public Long getArrivalId() {
-        return arrivalId;
+    public String getArrivalName() {
+        return arrivalName;
     }
 }

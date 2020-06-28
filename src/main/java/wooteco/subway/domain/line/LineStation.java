@@ -1,58 +1,55 @@
 package wooteco.subway.domain.line;
 
-import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import wooteco.subway.domain.station.Station;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "LINE_STATION")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
+@Getter
 public class LineStation {
-    private Long preStationId;
-    private Long stationId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "line_station_id")
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "line_id", nullable = false)
+    private Line line;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "pre_station_id")
+    private Station preStation;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "station_id", nullable = false)
+    private Station station;
+
     private int distance;
     private int duration;
 
-    public LineStation(Long preStationId, Long stationId, int distance, int duration) {
-        this.preStationId = preStationId;
-        this.stationId = stationId;
+    public LineStation(Station preStation, Station station, int distance, int duration) {
+        this.preStation = preStation;
+        this.station = station;
         this.distance = distance;
         this.duration = duration;
     }
 
-    public Long getPreStationId() {
-        return preStationId;
+    public void updatePreLineStation(Station preStation) {
+        this.preStation = preStation;
     }
 
-    public Long getStationId() {
-        return stationId;
+    public boolean isLineStationOf(Station preStation, Station station) {
+        return this.preStation == preStation && this.station == station
+                || this.preStation == station && this.station == preStation;
     }
 
-    public int getDistance() {
-        return distance;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void updatePreLineStation(Long preStationId) {
-        this.preStationId = preStationId;
-    }
-
-    public boolean isLineStationOf(Long preStationId, Long stationId) {
-        return this.preStationId == preStationId && this.stationId == stationId
-                || this.preStationId == stationId && this.stationId == preStationId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LineStation that = (LineStation) o;
-        return distance == that.distance &&
-                duration == that.duration &&
-                Objects.equals(preStationId, that.preStationId) &&
-                Objects.equals(stationId, that.stationId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(preStationId, stationId, distance, duration);
+    public void setLine(Line line) {
+        this.line = line;
     }
 }

@@ -1,15 +1,24 @@
 package wooteco.subway.domain.member;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.annotation.Id;
+import wooteco.subway.domain.BaseEntity;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-public class Member {
-    @Id
-    private Long id;
+@Entity
+@Table(name = "MEMBER")
+@AttributeOverride(name = "id", column = @Column(name = "member_id"))
+@Getter
+@EqualsAndHashCode(callSuper = false)
+public class Member extends BaseEntity {
+    @Column(unique = true)
     private String email;
+
     private String name;
     private String password;
 
@@ -27,22 +36,6 @@ public class Member {
         this.email = email;
         this.name = name;
         this.password = password;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void update(String name, String password) {

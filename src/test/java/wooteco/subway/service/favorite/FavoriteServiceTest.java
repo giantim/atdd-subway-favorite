@@ -48,14 +48,12 @@ class FavoriteServiceTest {
 
     @Test
     void createWhenValidInput() {
-        FavoriteRequest favoriteRequest = new FavoriteRequest(jamsil.getId(), gangnam.getId());
-        Favorite favorite = new Favorite(1L, 1L, favoriteRequest.getDepartureId(),
-                favoriteRequest.getArrivalId());
+        FavoriteRequest favoriteRequest = new FavoriteRequest(jamsil.getName(), gangnam.getName());
+        Favorite favorite = new Favorite(1L, new Member(), jamsil, gangnam);
 
-        when(stationRepository.findAllById(any())).thenReturn(Arrays.asList(new Station(), new Station()));
+        when(stationRepository.findAllByNameIn(any())).thenReturn(Arrays.asList(new Station(), new Station()));
         when(memberRepository.findById(1L)).thenReturn(Optional.of(new Member()));
-        when(favoriteRepository.findAllByMemberId(1L))
-                .thenReturn(Collections.emptyList());
+        when(favoriteRepository.findAllByMember(any())).thenReturn(Collections.emptyList());
         when(favoriteRepository.save(any())).thenReturn(favorite);
 
         favoriteService.create(1L, favoriteRequest);
@@ -66,13 +64,13 @@ class FavoriteServiceTest {
     @Test
     void createWhenDuplicatedInput() {
         Long duplicatedMemberId = 1L;
-        FavoriteRequest duplicatedFavoriteRequest = new FavoriteRequest(jamsil.getId(), gangnam.getId());
+        FavoriteRequest duplicatedFavoriteRequest = new FavoriteRequest(jamsil.getName(), gangnam.getName());
 
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(new Member("a@a", "a", "a")));
-        when(stationRepository.findAllById(any())).thenReturn(Arrays.asList(new Station(), new Station()));
-        when(favoriteRepository.findAllByMemberId(duplicatedMemberId))
-                .thenReturn(Collections.singletonList(new Favorite(duplicatedMemberId,
-                        duplicatedFavoriteRequest.getDepartureId(), duplicatedFavoriteRequest.getArrivalId())));
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(new Member(1L, "a@a", "a", "a")));
+        when(stationRepository.findAllByNameIn(any())).thenReturn(Arrays.asList(new Station(), new Station()));
+        when(favoriteRepository.findAllByMember(new Member(1L, "a@a", "a", "a")))
+                .thenReturn(Collections.singletonList(new Favorite(new Member(1L, "a@a", "a", "a"),
+                        new Station(), new Station())));
 
         assertThatThrownBy(() -> favoriteService.create(duplicatedMemberId, duplicatedFavoriteRequest))
                 .isInstanceOf(DuplicateFavoriteException.class);
@@ -81,12 +79,11 @@ class FavoriteServiceTest {
     @Test
     void deleteTest() {
         Long memberId = 1L;
-        FavoriteRequest favoriteRequest = new FavoriteRequest(jamsil.getId(), gangnam.getId());
+        FavoriteRequest favoriteRequest = new FavoriteRequest(jamsil.getName(), gangnam.getName());
 
-        when(favoriteRepository.findByMemberIdAndDepartureIdAndArrivalId(memberId,
-                favoriteRequest.getDepartureId(), favoriteRequest.getArrivalId()))
-                .thenReturn(Optional.of(
-                        new Favorite(memberId, favoriteRequest.getDepartureId(), favoriteRequest.getArrivalId())));
+        when(favoriteRepository.findByMemberIdAndDepartureNameAndArrivalName(memberId,
+                favoriteRequest.getDepartureName(), favoriteRequest.getArrivalName()))
+                .thenReturn(Optional.of(new Favorite(new Member(), jamsil, gangnam)));
 
         favoriteService.delete(memberId, favoriteRequest);
 

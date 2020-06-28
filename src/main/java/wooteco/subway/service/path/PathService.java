@@ -1,14 +1,15 @@
 package wooteco.subway.service.path;
 
 import org.springframework.stereotype.Service;
-import wooteco.subway.service.path.dto.PathResponse;
-import wooteco.subway.service.station.dto.StationResponse;
 import wooteco.subway.domain.line.Line;
 import wooteco.subway.domain.line.LineRepository;
 import wooteco.subway.domain.line.LineStation;
 import wooteco.subway.domain.path.PathType;
 import wooteco.subway.domain.station.Station;
 import wooteco.subway.domain.station.StationRepository;
+import wooteco.subway.service.path.dto.PathResponse;
+import wooteco.subway.service.station.dto.StationResponse;
+import wooteco.subway.service.station.exception.InvalidStationNameException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,11 +41,11 @@ public class PathService {
         List<Station> stations = stationRepository.findAllById(path);
 
         List<LineStation> lineStations = lines.stream()
-                .flatMap(it -> it.getStations().stream())
-                .filter(it -> Objects.nonNull(it.getPreStationId()))
+                .flatMap(it -> it.getLineStations().getStations().stream())
+                .filter(it -> Objects.nonNull(it.getPreStation()))
                 .collect(Collectors.toList());
 
-        List<LineStation> paths = extractPathLineStation(path, lineStations);
+        List<LineStation> paths = extractPathLineStation(path, lineStations, stations);
         int duration = paths.stream().mapToInt(it -> it.getDuration()).sum();
         int distance = paths.stream().mapToInt(it -> it.getDistance()).sum();
 
@@ -62,7 +63,8 @@ public class PathService {
                 .orElseThrow(RuntimeException::new);
     }
 
-    private List<LineStation> extractPathLineStation(List<Long> path, List<LineStation> lineStations) {
+    private List<LineStation> extractPathLineStation(List<Long> path, List<LineStation> lineStations,
+                                                     List<Station> stations) {
         Long preStationId = null;
         List<LineStation> paths = new ArrayList<>();
 
@@ -71,10 +73,17 @@ public class PathService {
                 preStationId = stationId;
                 continue;
             }
-
             Long finalPreStationId = preStationId;
+            Station finalPreStation = stations.stream()
+                    .filter(station -> station.isSameId(finalPreStationId))
+                    .findFirst()
+                    .orElseThrow(InvalidStationNameException::new);
+            Station station = stations.stream()
+                    .filter(s -> s.isSameId(stationId))
+                    .findFirst()
+                    .orElseThrow(InvalidStationNameException::new);
             LineStation lineStation = lineStations.stream()
-                    .filter(it -> it.isLineStationOf(finalPreStationId, stationId))
+                    .filter(it -> it.isLineStationOf(finalPreStation, station))
                     .findFirst()
                     .orElseThrow(RuntimeException::new);
 

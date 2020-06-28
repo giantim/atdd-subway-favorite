@@ -1,24 +1,22 @@
 package wooteco.subway.domain.favorite;
 
-import org.springframework.data.jdbc.repository.query.Modifying;
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import wooteco.subway.domain.member.Member;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface FavoriteRepository extends CrudRepository<Favorite, Long> {
-    @Query("SELECT * FROM favorite WHERE member_id = :memberId")
-    List<Favorite> findAllByMemberId(@Param("memberId") Long memberId);
+@Repository
+public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
+    List<Favorite> findAllByMember(Member member);
 
-    @Query("SELECT * FROM favorite " +
-            "WHERE member_id = :memberId AND departure_id = :departureId AND arrival_id = :arrivalId")
-    Optional<Favorite> findByMemberIdAndDepartureIdAndArrivalId(@Param("memberId") Long memberId,
-                                                            @Param("departureId") Long departureId,
-                                                            @Param("arrivalId") Long arrivalId);
+    List<Favorite> findAllByMemberId(Long memberId);
 
-    @Modifying
-    @Query("DELETE FROM favorite WHERE member_id = :memberId")
-    void deleteByMemberId(@Param("memberId") Long memberId);
+    Optional<Favorite> findByMemberIdAndDepartureIdAndArrivalId(Long memberId, Long departureId, Long arrivalId);
+
+    Optional<Favorite> findByMemberIdAndDepartureNameAndArrivalName(Long memberId, String departureName,
+                                                                    String arrivalName);
+
+    void deleteByMemberId(Long memberId);
 }

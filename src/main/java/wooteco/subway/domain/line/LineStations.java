@@ -1,9 +1,21 @@
 package wooteco.subway.domain.line;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import wooteco.subway.domain.station.Station;
+
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import java.util.*;
 
+@Embeddable
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class LineStations {
-    private Set<LineStation> stations;
+    @OneToMany(mappedBy = "line", fetch = FetchType.EAGER)
+    private Set<LineStation> stations = new HashSet<>();
 
     public LineStations(Set<LineStation> stations) {
         this.stations = stations;
@@ -13,22 +25,18 @@ public class LineStations {
         return new LineStations(new HashSet<>());
     }
 
-    public Set<LineStation> getStations() {
-        return stations;
-    }
-
     public void add(LineStation targetLineStation) {
-        updatePreStationOfNextLineStation(targetLineStation.getPreStationId(), targetLineStation.getStationId());
+        updatePreStationOfNextLineStation(targetLineStation.getPreStation(), targetLineStation.getStation());
         stations.add(targetLineStation);
     }
 
     private void remove(LineStation targetLineStation) {
-        updatePreStationOfNextLineStation(targetLineStation.getStationId(), targetLineStation.getPreStationId());
+        updatePreStationOfNextLineStation(targetLineStation.getStation(), targetLineStation.getPreStation());
         stations.remove(targetLineStation);
     }
 
     public void removeById(Long targetStationId) {
-        extractByStationId(targetStationId)
+        extractByStation(targetStationId)
                 .ifPresent(this::remove);
     }
 
@@ -38,31 +46,31 @@ public class LineStations {
         return result;
     }
 
-    private void extractNext(Long preStationId, List<Long> ids) {
+    private void extractNext(Station preStation, List<Long> ids) {
         stations.stream()
-                .filter(it -> Objects.equals(it.getPreStationId(), preStationId))
+                .filter(it -> Objects.equals(it.getPreStation(), preStation))
                 .findFirst()
                 .ifPresent(it -> {
-                    Long nextStationId = it.getStationId();
-                    ids.add(nextStationId);
+                    Station nextStationId = it.getStation();
+                    ids.add(nextStationId.getId());
                     extractNext(nextStationId, ids);
                 });
     }
 
-    private void updatePreStationOfNextLineStation(Long targetStationId, Long newPreStationId) {
-        extractByPreStationId(targetStationId)
-                .ifPresent(it -> it.updatePreLineStation(newPreStationId));
+    private void updatePreStationOfNextLineStation(Station targetStation, Station newPreStation) {
+        extractByPreStation(targetStation)
+                .ifPresent(it -> it.updatePreLineStation(newPreStation));
     }
 
-    private Optional<LineStation> extractByStationId(Long stationId) {
+    private Optional<LineStation> extractByStation(Long stationId) {
         return stations.stream()
-                .filter(it -> Objects.equals(it.getStationId(), stationId))
+                .filter(it -> Objects.equals(it.getStation().getId(), stationId))
                 .findFirst();
     }
 
-    private Optional<LineStation> extractByPreStationId(Long preStationId) {
+    private Optional<LineStation> extractByPreStation(Station preStation) {
         return stations.stream()
-                .filter(it -> Objects.equals(it.getPreStationId(), preStationId))
+                .filter(it -> Objects.equals(it.getPreStation(), preStation))
                 .findFirst();
     }
 
@@ -72,5 +80,13 @@ public class LineStations {
 
     public int getTotalDuration() {
         return stations.stream().mapToInt(it -> it.getDuration()).sum();
+    }
+
+    public boolean isContain(LineStation lineStation) {
+        return stations.contains(lineStation);
+    }
+
+    public void removeLineStation(LineStation lineStation) {
+        stations.remove(lineStation);
     }
 }

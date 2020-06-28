@@ -1,51 +1,46 @@
 package wooteco.subway.domain.favorite;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.PersistenceConstructor;
-import wooteco.subway.service.favorite.dto.FavoriteRequest;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import wooteco.subway.domain.BaseEntity;
+import wooteco.subway.domain.member.Member;
+import wooteco.subway.domain.station.Station;
 
-public class Favorite {
-    @Id
-    private Long id;
-    private Long memberId;
-    private Long departureId;
-    private Long arrivalId;
+import javax.persistence.*;
 
-    public Favorite(Long memberId, Long departureId, Long arrivalId) {
-        this(null, memberId, departureId, arrivalId);
+@Entity
+@Table(name = "FAVORITE")
+@AttributeOverride(name = "id", column = @Column(name = "favorite_id"))
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+public class Favorite extends BaseEntity {
+    @OneToOne
+    @JoinColumn(name = "departure_id")
+    private Station departure;
+
+    @OneToOne
+    @JoinColumn(name = "arrival_id")
+    private Station arrival;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    public Favorite(Member member, Station departure, Station arrival) {
+        this(null, member, departure, arrival);
     }
 
-    @PersistenceConstructor
-    public Favorite(Long id, Long memberId, Long departureId, Long arrivalId) {
+    public Favorite(Long id, Member member, Station departure, Station arrival) {
         this.id = id;
-        this.memberId = memberId;
-        this.departureId = departureId;
-        this.arrivalId = arrivalId;
-    }
-
-    public static Favorite of(Long memberId, FavoriteRequest favoriteRequest) {
-        return new Favorite(memberId, favoriteRequest.getDepartureId(), favoriteRequest.getArrivalId());
+        this.member = member;
+        this.departure = departure;
+        this.arrival = arrival;
     }
 
     public boolean isDuplicate(Favorite favorite) {
-        return this.memberId.equals(favorite.memberId)
-                && this.departureId.equals(favorite.departureId)
-                && this.arrivalId.equals(favorite.arrivalId);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getMemberId() {
-        return memberId;
-    }
-
-    public Long getDepartureId() {
-        return departureId;
-    }
-
-    public Long getArrivalId() {
-        return arrivalId;
+        return this.member.equals(favorite.member)
+                && this.departure.equals(favorite.departure)
+                && this.arrival.equals(favorite.arrival);
     }
 }

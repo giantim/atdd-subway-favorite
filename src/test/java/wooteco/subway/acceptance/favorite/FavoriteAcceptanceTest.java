@@ -38,10 +38,10 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
 
         return Stream.of(dynamicTest("즐겨찾기 추가", () -> {
                 // given 경로를 검색한 상태이다
-                Long departureId = kangnam.getId();
-                Long arrivalId = hanti.getId();
+                String departureName = kangnam.getName();
+                String arrivalName = hanti.getName();
                 // when 즐겨찾기를 저장하는 요청을 보낸다
-                String location = addFavorite(tokenResponse, departureId, arrivalId);
+                String location = addFavorite(tokenResponse, departureName, arrivalName);
 
                 // then 해당 회원에 즐겨찾기가 추가되었다
                 assertThat(location).isNotNull();
@@ -55,9 +55,9 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
             }),
             dynamicTest("즐겨찾기 삭제", () -> {
                 // when 회원이 즐겨찾기 삭제를 요청한다
-                Long departureId = kangnam.getId();
-                Long arrivalId = hanti.getId();
-                deleteFavorite(tokenResponse, departureId, arrivalId);
+                String departureName = kangnam.getName();
+                String arrivalName = hanti.getName();
+                deleteFavorite(tokenResponse, departureName, arrivalName);
 
                 // then 해당 회원의 즐겨찾기가 삭제되었다
                 List<FavoriteResponse> favoriteResponses = getFavorites(tokenResponse);
@@ -65,10 +65,10 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
             }));
     }
 
-    private String addFavorite(TokenResponse tokenResponse, Long departureId, Long arrivalId) {
-        Map<String, Long> params = new HashMap<>();
-        params.put("departureId", departureId);
-        params.put("arrivalId", arrivalId);
+    private String addFavorite(TokenResponse tokenResponse, String departureName, String arrivalName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("departureName", departureName);
+        params.put("arrivalName", arrivalName);
 
         return given().
             header("Authorization",
@@ -97,10 +97,10 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
             extract().jsonPath().getList(".", FavoriteResponse.class);
     }
 
-    private void deleteFavorite(TokenResponse tokenResponse, Long departureId, Long arrivalId) {
-        Map<String, Long> params = new HashMap<>();
-        params.put("departureId", departureId);
-        params.put("arrivalId", arrivalId);
+    private void deleteFavorite(TokenResponse tokenResponse, String departureName, String arrivalName) {
+        Map<String, String> params = new HashMap<>();
+        params.put("departureName", departureName);
+        params.put("arrivalName", arrivalName);
 
         given().
             header("Authorization", tokenResponse.getTokenType() + " " + tokenResponse.getAccessToken()).

@@ -1,31 +1,27 @@
 package wooteco.subway.domain.line;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.relational.core.mapping.Embedded;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import wooteco.subway.domain.BaseEntity;
 
-import java.time.LocalDateTime;
+import javax.persistence.*;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Set;
 
-public class Line {
-    @Id
-    private Long id;
+@Entity
+@Table(name = "LINE")
+@AttributeOverride(name = "id", column = @Column(name = "line_id"))
+@Getter
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+public class Line extends BaseEntity {
     private String name;
     private LocalTime startTime;
     private LocalTime endTime;
     private int intervalTime;
-    @CreatedDate
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-    @Embedded.Empty
-    private LineStations stations = LineStations.empty();
 
-    public Line() {
-    }
+    @Embedded
+    private LineStations lineStations = LineStations.empty();
 
     public Line(Long id, String name, LocalTime startTime, LocalTime endTime, int intervalTime) {
         this.name = name;
@@ -36,38 +32,6 @@ public class Line {
 
     public Line(String name, LocalTime startTime, LocalTime endTime, int intervalTime) {
         this(null, name, startTime, endTime, intervalTime);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public int getIntervalTime() {
-        return intervalTime;
-    }
-
-    public Set<LineStation> getStations() {
-        return stations.getStations();
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
     public void update(Line line) {
@@ -86,14 +50,14 @@ public class Line {
     }
 
     public void addLineStation(LineStation lineStation) {
-        stations.add(lineStation);
+        lineStations.add(lineStation);
     }
 
     public void removeLineStationById(Long stationId) {
-        stations.removeById(stationId);
+        lineStations.removeById(stationId);
     }
 
     public List<Long> getStationIds() {
-        return stations.getStationIds();
+        return lineStations.getStationIds();
     }
 }

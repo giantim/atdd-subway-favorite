@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wooteco.subway.domain.favorite.Favorite;
 import wooteco.subway.domain.favorite.FavoriteRepository;
+import wooteco.subway.domain.member.Member;
 import wooteco.subway.domain.member.MemberRepository;
+import wooteco.subway.domain.station.Station;
 import wooteco.subway.domain.station.StationRepository;
 import wooteco.subway.service.favorite.dto.FavoriteRequest;
 import wooteco.subway.service.favorite.dto.FavoriteResponse;
@@ -30,31 +32,32 @@ public class FavoriteService {
 
     @Transactional
     public Long create(Long memberId, FavoriteRequest favoriteRequest) {
-        memberRepository.findById(memberId).orElseThrow(InvalidMemberIdException::new);
-        List<Long> stationIds = favoriteRequest.stationsIds();
-        if (stationRepository.findAllById(stationIds).size() != 2) {
+        Member member = memberRepository.findById(memberId).orElseThrow(InvalidMemberIdException::new);
+        List<String> stationNames = favoriteRequest.stationNames();
+        List<Station> stations = stationRepository.findAllByNameIn(stationNames);
+        if (stations.size() != 2) {
             throw new InvalidStationNameException();
         }
 
-        Favorite favorite = Favorite.of(memberId, favoriteRequest);
+        Favorite favorite = new Favorite(member, stations.get(0), stations.get(1));
 
-        if (isDuplicateFavorite(memberId, favorite)) {
+        if (isDuplicateFavorite(member, favorite)) {
             throw new DuplicateFavoriteException();
         }
 
         return favoriteRepository.save(favorite).getId();
     }
 
-    private boolean isDuplicateFavorite(Long memberId, Favorite favorite) {
-        return favoriteRepository.findAllByMemberId(memberId)
+    private boolean isDuplicateFavorite(Member member, Favorite favorite) {
+        return favoriteRepository.findAllByMember(member)
                 .stream()
                 .anyMatch(f -> f.isDuplicate(favorite));
     }
 
     @Transactional
     public void delete(Long memberId, FavoriteRequest favoriteRequest) {
-        Favorite favorite = favoriteRepository.findByMemberIdAndDepartureIdAndArrivalId(memberId,
-                favoriteRequest.getDepartureId(), favoriteRequest.getArrivalId())
+        Favorite favorite = favoriteRepository.findByMemberIdAndDepartureNameAndArrivalName(memberId,
+                favoriteRequest.getDepartureName(), favoriteRequest.getArrivalName())
                 .orElseThrow(NoExistFavoriteException::new);
 
         favoriteRepository.delete(favorite);

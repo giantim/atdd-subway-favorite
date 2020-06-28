@@ -54,12 +54,12 @@ function Search() {
     const isFavorite = $favoriteButton.classList.contains('mdi-star')
     const classList = $favoriteButton.classList
 
-    const departureId = stations[0].id;
-    const arrivalId = stations[stations.length - 1].id;
+    const departureName = stations[0].name;
+    const arrivalName = stations[stations.length - 1].name;
 
     await api.favorite.create({
-      departureId,
-      arrivalId
+      departureName,
+      arrivalName
     }).then(response => {
       if (response.ok) {
         alert("즐겨찾기에 저장되었습니다.");

@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import wooteco.subway.doc.FavoriteDocumentation;
 import wooteco.subway.domain.station.Station;
@@ -58,6 +59,7 @@ class FavoriteControllerTest {
         RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .addFilter(new ShallowEtagHeaderFilter())
+            .addFilter(new CharacterEncodingFilter("UTF-8", true))
             .apply(documentationConfiguration(restDocumentation))
             .build();
     }
@@ -66,7 +68,7 @@ class FavoriteControllerTest {
     void createFavorite() throws Exception {
         given(favoriteService.create(any(), any())).willReturn(1L);
 
-        String inputJson = "{\"departureId\" : \"1\", \"arrivalId\" : \"3\"}";
+        String inputJson = "{\"departureName\" : \"잠실역\", \"arrivalName\" : \"암사역\"}";
 
         String email = "test@test.com";
         given(memberService.findMemberByEmail(email)).willReturn(new MemberResponse(1L, email, "test"));
@@ -86,7 +88,7 @@ class FavoriteControllerTest {
     void showFavorites() throws Exception {
         Station jamsil = new Station(1L, "잠실");
         Station gangnam = new Station(2L, "강남");
-        FavoriteResponse favoriteResponse = new FavoriteResponse(jamsil.getId(), gangnam.getId());
+        FavoriteResponse favoriteResponse = new FavoriteResponse(jamsil.getName(), gangnam.getName());
         List<FavoriteResponse> favoriteResponses = Collections.singletonList(favoriteResponse);
         given(favoriteService.findAll(any())).willReturn(favoriteResponses);
 

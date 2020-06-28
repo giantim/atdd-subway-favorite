@@ -1,24 +1,34 @@
 package wooteco.subway.service.line;
 
 import org.springframework.stereotype.Service;
+import wooteco.subway.domain.line.Line;
+import wooteco.subway.domain.line.LineRepository;
+import wooteco.subway.domain.line.LineStation;
+import wooteco.subway.domain.line.LineStationRepository;
+import wooteco.subway.domain.station.Station;
+import wooteco.subway.domain.station.StationRepository;
 import wooteco.subway.service.line.dto.LineDetailResponse;
 import wooteco.subway.service.line.dto.LineRequest;
 import wooteco.subway.service.line.dto.LineStationCreateRequest;
 import wooteco.subway.service.line.dto.WholeSubwayResponse;
-import wooteco.subway.domain.line.Line;
-import wooteco.subway.domain.line.LineRepository;
-import wooteco.subway.domain.line.LineStation;
+import wooteco.subway.service.station.exception.InvalidStationNameException;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LineService {
     private LineStationService lineStationService;
     private LineRepository lineRepository;
+    private StationRepository stationRepository;
+    private LineStationRepository lineStationRepository;
 
-    public LineService(LineStationService lineStationService, LineRepository lineRepository) {
+    public LineService(LineStationService lineStationService, LineRepository lineRepository,
+                       StationRepository stationRepository, LineStationRepository lineStationRepository) {
         this.lineStationService = lineStationService;
         this.lineRepository = lineRepository;
+        this.stationRepository = stationRepository;
+        this.lineStationRepository = lineStationRepository;
     }
 
     public Line save(Line line) {
@@ -45,10 +55,22 @@ public class LineService {
 
     public void addLineStation(Long id, LineStationCreateRequest request) {
         Line line = lineRepository.findById(id).orElseThrow(RuntimeException::new);
-        LineStation lineStation = new LineStation(request.getPreStationId(), request.getStationId(), request.getDistance(), request.getDuration());
+        Station preStation = findPreStation(request);
+        Station station = stationRepository.findById(request.getStationId())
+                .orElseThrow(InvalidStationNameException::new);
+        LineStation lineStation = new LineStation(preStation, station, request.getDistance(), request.getDuration());
+        lineStation.setLine(line);
         line.addLineStation(lineStation);
-
+        lineStationRepository.save(lineStation);
         lineRepository.save(line);
+    }
+
+    private Station findPreStation(LineStationCreateRequest request) {
+        Long preStationId = request.getPreStationId();
+        if (Objects.isNull(preStationId)) {
+            return null;
+        }
+        return stationRepository.findById(preStationId).orElseThrow(InvalidStationNameException::new);
     }
 
     public void removeLineStation(Long lineId, Long stationId) {
